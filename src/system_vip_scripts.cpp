@@ -101,7 +101,7 @@ public:
                 OnGossipSelect(player, creature, 0, 2);
             }
             else {
-                player->GetSession()->SendNotification("No tienes suficientes Tokens.");
+                ChatHandler(player->GetSession()).PSendSysMessage("No tienes suficientes Tokens.");
                 CloseGossipMenuFor(player);
             }
             break;
@@ -133,20 +133,20 @@ class SystemVipPocket : ItemScript {
 public:
     SystemVipPocket() : ItemScript("SystemVipPocket") {}
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) {
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) {
         if (!sV->isVip(player)) {
-            player->GetSession()->SendNotification("No eres Vip!");
+            ChatHandler(player->GetSession()).PSendSysMessage("No eres Vip!");
             ChatHandler(player->GetSession()).PSendSysMessage("Por favor renueva tu suscription vip.");
             return false;
         }
 
         /*if (player->IsInCombat()) {
-            player->GetSession()->SendNotification("Estas en combate!");
+            ChatHandler(player->GetSession()).PSendSysMessage("Estas en combate!");
             return false;
         }*/
 
         if (player->GetMap()->IsBattleArena()) {
-            player->GetSession()->SendNotification("No puedes usar en arena!");
+            ChatHandler(player->GetSession()).PSendSysMessage("No puedes usar en arena!");
             return false;
         }
 
@@ -215,7 +215,7 @@ public:
         {
         case 1:
             if (player->IsInCombat()) {
-                player->GetSession()->SendNotification("Estás en combate!");
+                ChatHandler(player->GetSession()).PSendSysMessage("Estás en combate!");
                 CloseGossipMenuFor(player);
             }
             else {
@@ -243,21 +243,21 @@ public:
             if (player->IsInCombat())
             {
                 CloseGossipMenuFor(player);
-                player->GetSession()->SendNotification("Estás en combate!");
+                ChatHandler(player->GetSession()).PSendSysMessage("Estás en combate!");
                 return false;
             }
             else if (player->getPowerType() == POWER_MANA)
                 player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
 
             player->SetHealth(player->GetMaxHealth());
-            player->GetSession()->SendNotification("HP/MANA Restaurados!");
+            ChatHandler(player->GetSession()).PSendSysMessage("HP/MANA Restaurados!");
             creature->CastSpell(player, 31726, true);
             OnGossipHello(player, creature);
             break;
         case 6:
             if (player->HasAura(15007))
                 player->RemoveAura(15007);
-            player->GetSession()->SendNotification("Tu dolencia fué removido.");
+            ChatHandler(player->GetSession()).PSendSysMessage("Tu dolencia fué removido.");
             creature->CastSpell(player, 31726, true);
             OnGossipHello(player, creature);
             break;
@@ -265,7 +265,7 @@ public:
             // remover desertor
             if(player->HasAura(26013))
                 player->RemoveAura(26013);
-            player->GetSession()->SendNotification("Tu marca de desertor fué removido.");
+            ChatHandler(player->GetSession()).PSendSysMessage("Tu marca de desertor fué removido.");
             creature->CastSpell(player, 31726);
             OnGossipHello(player, creature);
             break;
@@ -291,7 +291,7 @@ public:
                 }
             }
 
-            player->GetSession()->SendNotification("Tus instancias fueron reinicidas!");
+            ChatHandler(player->GetSession()).PSendSysMessage("Tus instancias fueron reinicidas!");
             creature->CastSpell(player, 59908);
             OnGossipHello(player, creature);
             return true;

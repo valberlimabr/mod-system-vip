@@ -86,7 +86,7 @@ string SystemVip::getFormatedVipTime(Player* player) {
 
     hours = hours % 24;
     minutes = minutes % 60;
-    int seconds = time % 60;
+    // int seconds = time % 60;
 
     string result = to_string(days) + "dias " + to_string(hours) + "horas " + to_string(minutes) + "minutos.";
     return result;
@@ -109,8 +109,9 @@ string SystemVip::getItemLink(uint32 entry, Player* player) {
 string SystemVip::getInformationVip(Player* player) {
     std::ostringstream text;
     std::string accName;
-    if (AccountMgr::GetName(player->GetSession()->GetAccountId(), accName));
-    text << "Tiempo restante: |CFF0DD617" << getFormatedVipTime(player) << "|r\n";
+    if (AccountMgr::GetName(player->GetSession()->GetAccountId(), accName))
+        text << "Tiempo restante: |CFF0DD617" << getFormatedVipTime(player) << "|r\n";
+
     return text.str();
 }
 
@@ -149,7 +150,7 @@ string SystemVip::getInformationAdavantages() {
         if(resetInstance)
             text << "|TInterface/ICONS/Achievement_Dungeon_Icecrown_IcecrownEntrance:15:15:-10::-8|t Reiniciar instancias." << "\n";
         if(saveTeleport)
-            text << "|TInterface/ICONS/Spell_Holy_LightsGrace:15:15:-10::-8|t Guardar zonas para teleport." << "\n";    
+            text << "|TInterface/ICONS/Spell_Holy_LightsGrace:15:15:-10::-8|t Guardar zonas para teleport." << "\n";
     }
     return text.str();
 }
@@ -157,11 +158,12 @@ string SystemVip::getInformationAdavantages() {
 void SystemVip::sendGossipInformation(Player* player, bool advantages) {
     std::ostringstream text;
     std::string accName;
-    if (AccountMgr::GetName(player->GetSession()->GetAccountId(), accName));
-    text << "Usuario: |CFF0E3CE6" << accName << "|r\n";
+    if (AccountMgr::GetName(player->GetSession()->GetAccountId(), accName))
+        text << "Usuario: |CFF0E3CE6" << accName << "|r\n";
+
     if (isVip(player)) {
         text << "Tiempo restante: |CFF0DD617" << getFormatedVipTime(player) << "|r\n\n";
-        text << "Gracias por comprar una suscripcion vip.\n\n"; 
+        text << "Gracias por comprar una suscripcion vip.\n\n";
     }
     else {
         text << "No tienes una suscripción vip disponible.\n";
@@ -206,7 +208,7 @@ void SystemVip::delExpireVip(Player* player) {
 string SystemVip::getLoginMessage(Player* player) {
     string welcomeMessage = loginMessage;
     string name = player->GetName();
-    size_t pos = welcomeMessage.find("%s"); 
+    size_t pos = welcomeMessage.find("%s");
 
     if (pos != std::string::npos) {
         welcomeMessage.replace(pos, 2, name);
@@ -234,13 +236,13 @@ void SystemVip::addTeleportVip(Player* player, string name) {
     uint32 id = 1;
     if (teleportMap.count(accountId) > 0) {
         if (teleportMap[accountId].size() == saveTeleportAmount) {
-            player->GetSession()->SendNotification("No puedes guardar mas Teleports!");
+            ChatHandler(player->GetSession()).PSendSysMessage("No puedes guardar mas Teleports!");
             return;
         }
 
         for (size_t i = 0; i < teleportMap[accountId].size(); i++) {
             if (teleportMap[accountId][i].name == teleport.name) {
-                player->GetSession()->SendNotification("Ya existe un teleport con el mismo nombre!");
+                ChatHandler(player->GetSession()).PSendSysMessage("Ya existe un teleport con el mismo nombre!");
                 return;
             }
         }
@@ -261,7 +263,7 @@ void SystemVip::delTeleportVip(Player* player, string name) {
             return;
         }
     }
-    player->GetSession()->SendNotification("Nombre incorrecto.");
+    ChatHandler(player->GetSession()).PSendSysMessage("Nombre incorrecto.");
 }
 
 void SystemVip::getTeleports(Player* player) {

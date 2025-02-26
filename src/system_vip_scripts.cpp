@@ -96,45 +96,45 @@ public:
         ClearGossipMenuFor(player);
         switch (action)
         {
-        case 1:
-            if (player->HasItemCount(sV->TokenEntry, sV->TokenAmount))
-            {
-                player->DestroyItemCount(sV->TokenEntry, sV->TokenAmount, true);
-                sV->addRemainingVipTime(player);
-                if (!player->HasItemCount(44824, 1, true))
-                    player->AddItem(44824, 1);
+            case 1:
+                if (player->HasItemCount(sV->TokenEntry, sV->TokenAmount))
+                {
+                    player->DestroyItemCount(sV->TokenEntry, sV->TokenAmount, true);
+                    sV->addRemainingVipTime(player);
+                    if (!player->HasItemCount(44824, 1, true))
+                        player->AddItem(44824, 1);
 
-                ChatHandler(player->GetSession()).PSendSysMessage("Gracias por tu suscripcion vip.");
-                ChatHandler(player->GetSession()).PSendSysMessage("Tiempo de suscripcion vip disponible: %s", sV->getFormatedVipTime(player).c_str());
-                OnGossipSelect(player, creature, 0, 2);
-            }
-            else
-            {
-                ChatHandler(player->GetSession()).PSendSysMessage("No tienes suficientes Tokens.");
+                    ChatHandler(player->GetSession()).PSendSysMessage("Gracias por tu suscripcion vip.");
+                    ChatHandler(player->GetSession()).PSendSysMessage("Tiempo de suscripcion vip disponible: %s", sV->getFormatedVipTime(player).c_str());
+                    OnGossipSelect(player, creature, 0, 2);
+                }
+                else
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage("No tienes suficientes Tokens.");
+                    CloseGossipMenuFor(player);
+                }
+                break;
+            case 2:
+                sV->sendGossipInformation(player, true);
+                AddGossipItemFor(player, 0, "|TInterface/ICONS/Trade_Engineering:28:28:-15:0|t Cerrar.", 0, 3);
+                SendGossipMenuFor(player, VENDOR_INFO, creature->GetGUID());
+                break;
+            case 4:
+                if (!player->HasItemCount(44824, 1, true))
+                {
+                    player->AddItem(44824, 1);
+                    creature->Whisper("No lo vuelvas a perder.", LANG_UNIVERSAL, player, false);
+                    CloseGossipMenuFor(player);
+                }
+                else
+                {
+                    creature->Whisper("Ya tienes un item para invocar a tu mascota VIP.", LANG_UNIVERSAL, player, false);
+                    OnGossipHello(player, creature);
+                }
+                break;
+            default:
                 CloseGossipMenuFor(player);
-            }
-            break;
-        case 2:
-            sV->sendGossipInformation(player, true);
-            AddGossipItemFor(player, 0, "|TInterface/ICONS/Trade_Engineering:28:28:-15:0|t Cerrar.", 0, 3);
-            SendGossipMenuFor(player, VENDOR_INFO, creature->GetGUID());
-            break;
-        case 4:
-            if (!player->HasItemCount(44824, 1, true))
-            {
-                player->AddItem(44824, 1);
-                creature->Whisper("No lo vuelvas a perder.", LANG_UNIVERSAL, player, false);
-                CloseGossipMenuFor(player);
-            }
-            else
-            {
-                creature->Whisper("Ya tienes un item para invocar a tu mascota VIP.", LANG_UNIVERSAL, player, false);
-                OnGossipHello(player, creature);
-            }
-            break;
-        default:
-            CloseGossipMenuFor(player);
-            break;
+                break;
         }
         return true;
     }
@@ -229,116 +229,116 @@ public:
         ClearGossipMenuFor(player);
         switch (action)
         {
-        case 1:
-            if (player->IsInCombat())
-            {
-                ChatHandler(player->GetSession()).PSendSysMessage("Estás en combate!");
-                CloseGossipMenuFor(player);
-            }
-            else
-            {
-                player->TeleportTo(sV->vipZoneMapId, sV->vipZonePosX, sV->vipZonePosY, sV->vipZonePosZ, sV->vipZoneO);
-                CloseGossipMenuFor(player);
-            }
-            break;
-        case 2:
-            player->DurabilityRepairAll(false, 0, false);
-            ChatHandler(player->GetSession()).PSendSysMessage("Reparaste tus armaduras.");
-            OnGossipHello(player, creature);
-            break;
-        case 3:
-            player->GetSession()->SendShowBank(creature->GetGUID());
-            break;
-        case 4:
-            for (size_t i = 0; i < sV->buffIds.size(); i++)
-                player->AddAura(sV->buffIds[i], player);
-
-            player->CastSpell(player, 16609);
-            ChatHandler(player->GetSession()).PSendSysMessage("Buffos para ti!");
-            OnGossipHello(player, creature);
-            break;
-        case 5:
-            if (player->IsInCombat())
-            {
-                CloseGossipMenuFor(player);
-                ChatHandler(player->GetSession()).PSendSysMessage("Estás en combate!");
-                return false;
-            }
-            else if (player->getPowerType() == POWER_MANA)
-                player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
-
-            player->SetHealth(player->GetMaxHealth());
-            ChatHandler(player->GetSession()).PSendSysMessage("HP/MANA Restaurados!");
-            creature->CastSpell(player, 31726, true);
-            OnGossipHello(player, creature);
-            break;
-        case 6:
-            if (player->HasAura(15007))
-                player->RemoveAura(15007);
-            ChatHandler(player->GetSession()).PSendSysMessage("Tu dolencia fué removido.");
-            creature->CastSpell(player, 31726, true);
-            OnGossipHello(player, creature);
-            break;
-        case 7:
-            // remover desertor
-            if(player->HasAura(26013))
-                player->RemoveAura(26013);
-            ChatHandler(player->GetSession()).PSendSysMessage("Tu marca de desertor fué removido.");
-            creature->CastSpell(player, 31726);
-            OnGossipHello(player, creature);
-            break;
-        case 8:
-            // mostrar correo
-            CloseGossipMenuFor(player);
-            player->GetSession()->SendShowMailBox(creature->GetGUID());
-            break;
-        case 9:
-            // reiniciar cds
-            for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
-            {
-                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i));
-                for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
+            case 1:
+                if (player->IsInCombat())
                 {
-                    if (itr->first != player->GetMapId())
-                    {
-                        sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);
-                        itr = m_boundInstances.begin();
-                    }
-                    else
-                        ++itr;
+                    ChatHandler(player->GetSession()).PSendSysMessage("Estás en combate!");
+                    CloseGossipMenuFor(player);
                 }
-            }
+                else
+                {
+                    player->TeleportTo(sV->vipZoneMapId, sV->vipZonePosX, sV->vipZonePosY, sV->vipZonePosZ, sV->vipZoneO);
+                    CloseGossipMenuFor(player);
+                }
+                break;
+            case 2:
+                player->DurabilityRepairAll(false, 0, false);
+                ChatHandler(player->GetSession()).PSendSysMessage("Reparaste tus armaduras.");
+                OnGossipHello(player, creature);
+                break;
+            case 3:
+                player->GetSession()->SendShowBank(creature->GetGUID());
+                break;
+            case 4:
+                for (size_t i = 0; i < sV->buffIds.size(); i++)
+                    player->AddAura(sV->buffIds[i], player);
 
-            ChatHandler(player->GetSession()).PSendSysMessage("Tus instancias fueron reinicidas!");
-            creature->CastSpell(player, 59908);
-            OnGossipHello(player, creature);
-            return true;
-            break;
-        case 11:
-            for (size_t i = 0; i < sV->buffIds.size(); i++)
-            {
-                if (player->HasAura(sV->buffIds[i]))
-                    player->RemoveAura(sV->buffIds[i]);
-            }
-            if (player->HasAura(16609))
-                player->RemoveAura(16609);
-            creature->CastSpell(player, 31726);
-            ChatHandler(player->GetSession()).PSendSysMessage("Buffos para ti!");
-            OnGossipHello(player, creature);
-            break;
-        case 10:
-            // Sistema teleports
-            AddGossipItemFor(player, 0, "|TInterface/GUILDBANKFRAME/UI-GuildBankFrame-NewTab:28:28:-15:0|t Añadir nuevo.", 0, 1, "Nombre para guardar sus coordenadas.", 0, true);
-            AddGossipItemFor(player, 0, "|TInterface/PAPERDOLLINFOFRAME/UI-GearManager-Undo:28:28:-15:0|t Eliminar.", 0, 2, "Nombre a eliminar.", 0, true);
-            sV->getTeleports(player);
-            SendGossipMenuFor(player, 1, creature->GetGUID());
-            break;
-        case 12:
-            sV->teleportPlayer(player, sender);
-            CloseGossipMenuFor(player);
-        default:
-            CloseGossipMenuFor(player);
-            break;
+                player->CastSpell(player, 16609);
+                ChatHandler(player->GetSession()).PSendSysMessage("Buffos para ti!");
+                OnGossipHello(player, creature);
+                break;
+            case 5:
+                if (player->IsInCombat())
+                {
+                    CloseGossipMenuFor(player);
+                    ChatHandler(player->GetSession()).PSendSysMessage("Estás en combate!");
+                    return false;
+                }
+                else if (player->getPowerType() == POWER_MANA)
+                    player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
+
+                player->SetHealth(player->GetMaxHealth());
+                ChatHandler(player->GetSession()).PSendSysMessage("HP/MANA Restaurados!");
+                creature->CastSpell(player, 31726, true);
+                OnGossipHello(player, creature);
+                break;
+            case 6:
+                if (player->HasAura(15007))
+                    player->RemoveAura(15007);
+                ChatHandler(player->GetSession()).PSendSysMessage("Tu dolencia fué removido.");
+                creature->CastSpell(player, 31726, true);
+                OnGossipHello(player, creature);
+                break;
+            case 7:
+                // remover desertor
+                if(player->HasAura(26013))
+                    player->RemoveAura(26013);
+                ChatHandler(player->GetSession()).PSendSysMessage("Tu marca de desertor fué removido.");
+                creature->CastSpell(player, 31726);
+                OnGossipHello(player, creature);
+                break;
+            case 8:
+                // mostrar correo
+                CloseGossipMenuFor(player);
+                player->GetSession()->SendShowMailBox(creature->GetGUID());
+                break;
+            case 9:
+                // reiniciar cds
+                for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+                {
+                    BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i));
+                    for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
+                    {
+                        if (itr->first != player->GetMapId())
+                        {
+                            sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);
+                            itr = m_boundInstances.begin();
+                        }
+                        else
+                            ++itr;
+                    }
+                }
+
+                ChatHandler(player->GetSession()).PSendSysMessage("Tus instancias fueron reinicidas!");
+                creature->CastSpell(player, 59908);
+                OnGossipHello(player, creature);
+                return true;
+                break;
+            case 11:
+                for (size_t i = 0; i < sV->buffIds.size(); i++)
+                {
+                    if (player->HasAura(sV->buffIds[i]))
+                        player->RemoveAura(sV->buffIds[i]);
+                }
+                if (player->HasAura(16609))
+                    player->RemoveAura(16609);
+                creature->CastSpell(player, 31726);
+                ChatHandler(player->GetSession()).PSendSysMessage("Buffos para ti!");
+                OnGossipHello(player, creature);
+                break;
+            case 10:
+                // Sistema teleports
+                AddGossipItemFor(player, 0, "|TInterface/GUILDBANKFRAME/UI-GuildBankFrame-NewTab:28:28:-15:0|t Añadir nuevo.", 0, 1, "Nombre para guardar sus coordenadas.", 0, true);
+                AddGossipItemFor(player, 0, "|TInterface/PAPERDOLLINFOFRAME/UI-GearManager-Undo:28:28:-15:0|t Eliminar.", 0, 2, "Nombre a eliminar.", 0, true);
+                sV->getTeleports(player);
+                SendGossipMenuFor(player, 1, creature->GetGUID());
+                break;
+            case 12:
+                sV->teleportPlayer(player, sender);
+                CloseGossipMenuFor(player);
+            default:
+                CloseGossipMenuFor(player);
+                break;
         }
         return true;
     }

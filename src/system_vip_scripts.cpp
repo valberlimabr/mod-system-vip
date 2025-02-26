@@ -3,7 +3,7 @@
  */
 
 #include "SystemVip.h"
-#include "sWorldSessionMgr.h"
+#include "WorldSessionMgr.h"
 
 #define sV sSystemVip
 

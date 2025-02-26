@@ -45,6 +45,7 @@ public:
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
         if (sV->isVip(player) && sV->rateCustom)
+            amount *= sV->rateXp;
     }
 
     void OnPlayerBeforeLootMoney(Player* player, Loot* loot) override

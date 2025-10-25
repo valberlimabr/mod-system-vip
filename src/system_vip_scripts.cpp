@@ -4,6 +4,8 @@
 
 #include "SystemVip.h"
 #include "WorldSessionMgr.h"
+#include "Spell.h"            
+#include "SpellInfo.h"
 
 #define sV sSystemVip
 
@@ -18,7 +20,8 @@ public:
         PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
         PLAYERHOOK_ON_PLAYER_RELEASED_GHOST,
         PLAYERHOOK_ON_VICTIM_REWARD_AFTER,
-        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST
+        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST,
+        PLAYERHOOK_ON_SPELL_CAST
     }) { }
 
     void OnPlayerLogin(Player* player) override
@@ -76,6 +79,18 @@ public:
             player->ModifyHonorPoints(bonusHonor);
         }
     }
+    void OnPlayerSpellCast(Player* player, Spell* spell, bool /*skipCheck*/) override
+    {
+        if (!spell || !sV->isVip(player) || !sV->rateCustom)
+            return;
+
+        if (spell->GetSpellInfo()->Id == 61700 && sV->honorRate > 1)
+        {
+            uint32 baseHonor = 2000;
+            uint32 bonusHonor = baseHonor * (sV->honorRate - 1);
+            player->ModifyHonorPoints(bonusHonor);
+        }
+    }
 
     void OnPlayerReleasedGhost(Player* player) override
     {
@@ -97,7 +112,6 @@ public:
         }
     }
 };
-
 class SystemVipVendor : public CreatureScript {
 public:
     SystemVipVendor() : CreatureScript("SystemVipVendor") {}

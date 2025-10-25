@@ -17,7 +17,8 @@ public:
         PLAYERHOOK_ON_GIVE_EXP,
         PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
         PLAYERHOOK_ON_PLAYER_RELEASED_GHOST,
-        PLAYERHOOK_ON_VICTIM_REWARD_AFTER
+        PLAYERHOOK_ON_VICTIM_REWARD_AFTER,
+        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST
     }) { }
 
     void OnPlayerLogin(Player* player) override
@@ -52,6 +53,28 @@ public:
     {
         if (sV->isVip(player) && sV->rateCustom)
             loot->gold *= sV->goldRate;
+    }
+
+    void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
+    {
+        if (!sV->isVip(player) || !sV->rateCustom)
+            return;
+        if (quest->GetRewOrReqMoney() > 0)
+        {
+            uint32 baseGold = quest->GetRewOrReqMoney();
+            if (baseGold > 0 && sV->goldRate > 1)
+            {
+                uint32 bonusGold = baseGold * (sV->goldRate - 1);
+                player->ModifyMoney(bonusGold);
+            }
+        }
+
+        uint32 questHonor = quest->CalculateHonorGain(player->GetLevel());
+        if (questHonor > 0 && sV->honorRate > 1)
+        {
+            uint32 bonusHonor = questHonor * (sV->honorRate - 1);
+            player->ModifyHonorPoints(bonusHonor);
+        }
     }
 
     void OnPlayerReleasedGhost(Player* player) override

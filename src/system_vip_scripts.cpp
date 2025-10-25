@@ -38,6 +38,22 @@ public:
         sV->delExpireVip(player);
         if (sV->saveTeleport && sV->isVip(player))
             sV->loadTeleportVip(player);
+
+        uint32 vipItemId = 44824;
+        if (sV->isVip(player) && !player->HasItemCount(vipItemId, 1, true))
+        {
+            ItemPosCountVec dest;
+            if (player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, vipItemId, 1) == EQUIP_ERR_OK)
+            {
+                player->StoreNewItem(dest, vipItemId, 1, true);
+                ChatHandler(player->GetSession()).PSendSysMessage("La mascota VIP ha sido añadida a tu inventario!");
+            }
+            else
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage("¡Tu inventario está lleno, libera espacio y vuelve a iniciar sesión para recibir tu mascota VIP!");
+            }
+        }
+
     }
 
     void OnPlayerLogout(Player* player) override
